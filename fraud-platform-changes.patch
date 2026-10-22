@@ -1,0 +1,52 @@
+diff --git a/PROJECT_SUMMARY.md b/PROJECT_SUMMARY.md
+index d37ed71..fce05b9 100644
+--- a/PROJECT_SUMMARY.md
++++ b/PROJECT_SUMMARY.md
+@@ -138,44 +138,3 @@ docker-compose up -d
+ make minikube-up
+ ```
+ 
+-## 10 Interview Questions with Answers
+-
+-### 1. How did you handle the class imbalance in the fraud detection problem?
+-
+-**Answer**: Fraud was only 0.1% of transactions. I used two approaches: (1) XGBoost's `scale_pos_weight` parameter set to the inverse of the class ratio (~345:1), and (2) SMOTE oversampling on training data only. I used PR-AUC instead of accuracy as the primary metric since accuracy is misleading with imbalanced data.
+-
+-### 2. How did you ensure point-in-time correctness in your features?
+-
+-**Answer**: I used time-based train/validation/test splits (70/15/15) rather than random splits. For rolling features like transaction counts and amount averages, I used expanding windows sorted by account and time step, ensuring only historical data is used. I also added a leakage test that verifies the first transaction for each account has count=1.
+-
+-### 3. Why did you choose XGBoost over other models?
+-
+-**Answer**: XGBoost is well-suited for tabular fraud detection data, handles missing values well, and has built-in support for class imbalance via `scale_pos_weight`. It's also fast to train and provides feature importance, which is important for explainability in fraud detection. I compared it against SMOTE-augmented training to see if oversampling helped.
+-
+-### 4. How does the GNN improve fraud detection over XGBoost alone?
+-
+-**Answer**: The GNN captures relationship patterns that XGBoost misses - it can identify fraud rings by analyzing the transaction graph structure. Features like connected component size, shared counterparty counts, and destination popularity help detect coordinated fraud. In production, the GNN would complement XGBoost by catching network-level fraud patterns.
+-
+-### 5. How do you handle feature serving in real-time?
+-
+-**Answer**: I used a two-tier feature store approach: parquet files for offline historical queries during training, and SQLite for online low-latency serving during inference. The online store caches the latest features per account, enabling sub-millisecond feature lookups for real-time scoring.
+-
+-### 6. How do you monitor model drift?
+-
+-**Answer**: I implemented drift detection using statistical comparison of feature distributions between reference (training) and current (recent) data. I track the percentage drift in key features like amount, transaction velocity, and balance patterns. When the overall drift score exceeds a threshold (e.g., 10%), it triggers an automated retraining pipeline.
+-
+-### 7. What's your threshold selection strategy for fraud detection?
+-
+-**Answer**: I selected thresholds based on business requirements rather than just maximizing metrics. For example, I chose a threshold that achieves 90% precision to minimize false positives (which annoy customers), while tracking the corresponding recall. The threshold is configurable and can be tuned based on the cost tradeoff between missed fraud vs. false positives.
+-
+-### 8. How did you architect the streaming pipeline?
+-
+-**Answer**: Transactions flow into Kafka, where a FastAPI consumer reads them, fetches online features from the feature store, scores them with the blended model, and writes high-risk transactions to an alerts database. The architecture is horizontally scalable - multiple consumer instances can process transactions in parallel. End-to-end latency is measured and tracked in the p50/p95/p99 percentiles.
+-
+-### 9. What were the main challenges you faced?
+-
+-**Answer**: The biggest challenge was working with synthetic data that lacked real fraud patterns, resulting in artificially low PR-AUC. I also encountered compatibility issues between newer Python/pandas versions and some ML libraries (Feast, PyTorch MLflow logging), which I worked around by using simplified implementations. For production, real PaySim data and compatible library versions would be needed.
+-
+-### 10. How would you deploy this to production?
+-
+-**Answer**: I'd deploy using Kubernetes with Docker containers for each service: Kafka for streaming, the scoring API with auto-scaling based on load, Feast/Redis for feature serving, MLflow for model registry, and the Streamlit dashboard. I'd set up CI/CD with GitHub Actions, use Prometheus for monitoring, and implement a continuous retraining pipeline that triggers on drift detection or periodic schedules. Port-forwarding would expose services externally.
+diff --git a/data/online_store.db b/data/online_store.db
+index b875646..b7f9318 100644
+Binary files a/data/online_store.db and b/data/online_store.db differ

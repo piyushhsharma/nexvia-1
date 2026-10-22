@@ -1,0 +1,11 @@
+docs: add project summary with status and interview Q&A
+
+- Document what runs (all 10 stages complete)
+- Document limitations (synthetic data, compatibility issues)
+- Include real metrics from actual runs
+- Provide demo script with exact commands
+- Add 10 interview questions with detailed answers
+
+Generated with [Devin](https://devin.ai)
+
+Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>

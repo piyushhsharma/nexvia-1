@@ -1,0 +1,13 @@
+{
+  "total_rows": 500000,
+  "fraud_count": 500,
+  "fraud_rate": 0.001,
+  "transaction_types": 5,
+  "unique_orig_accounts": 486314,
+  "unique_dest_accounts": 486494,
+  "time_steps": 743,
+  "fraud_types": [
+    "CASH_OUT",
+    "TRANSFER"
+  ]
+}
